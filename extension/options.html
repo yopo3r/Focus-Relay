@@ -1,0 +1,34 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Focus Relay</title><link rel="stylesheet" href="style.css"></head>
+<body class="options"><main>
+  <header><img src="icon48.png" alt="" width="28" height="28"><strong>Focus Relay</strong></header>
+  <nav class="tabs" role="tablist">
+    <button class="tab on" data-tab="ajustes" data-i="oTabAjustes"></button>
+    <button class="tab" data-tab="como" data-i="oTabComo"></button>
+    <button class="tab" data-tab="acerca" data-i="oTabAcerca"></button>
+  </nav>
+  <section class="card pane" id="perm" hidden><p id="permMsg"></p><button id="permBtn"></button></section>
+  <section class="card pane" id="pane-ajustes">
+    <label for="lang" data-i="oIdioma"></label>
+    <select id="lang"></select>
+    <label for="theme" data-i="oTema"></label>
+    <select id="theme"></select>
+    <label for="port" data-i="oPuerto"></label>
+    <input id="port" type="number" min="1024" max="65535" placeholder="8765">
+    <p class="muted" data-i="oPuertoAyuda"></p>
+    <button id="save" data-i="oGuardar"></button>
+    <p id="msg" class="muted"></p>
+    <p id="lock" class="muted"></p>
+  </section>
+  <section class="card pane" id="pane-como" hidden>
+    <h2 data-i="cTitulo"></h2>
+    <p class="muted" data-i="cIntro"></p>
+    <ol class="steps"><li data-i="c1"></li><li data-i="c2"></li><li data-i="c3"></li><li data-i="c4"></li><li data-i="c5"></li></ol>
+  </section>
+  <section class="card pane" id="pane-acerca" hidden>
+    <h2 data-i="aTitulo"></h2>
+    <p id="ver" class="muted"></p>
+    <p data-i="aDesc"></p>
+    <p class="muted" data-i="aPrivacidad"></p>
+    <p class="muted" data-i="aPermisos"></p>
+  </section>
+</main><script src="i18n.js"></script><script src="common.js"></script><script src="options.js"></script></body></html>

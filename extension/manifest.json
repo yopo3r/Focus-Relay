@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Focus Relay",
+  "version": "4.1.0",
+  "description": "Bloquea sitios distractores mientras la app Focus Relay tiene una sesión activa. La app es la central de control.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "declarativeNetRequest",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Focus Relay",
+    "default_icon": {
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "blocked.html",
+        "style.css",
+        "common.js",
+        "i18n.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "homepage_url": "https://github.com/yopo3r/Focus-Relay"
+}

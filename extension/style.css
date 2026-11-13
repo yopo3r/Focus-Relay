@@ -1,0 +1,30 @@
+:root{--ink:#162033;--muted:#687386;--bg:#f2f5fa;--card:#fff;--line:#dfe5ef;--primary:#5b5bd6;--on:#fff;--ok:#0f9d83;--off:#9aa4b3}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--ink:#e8ecf6;--muted:#9aa6bb;--bg:#0e1320;--card:#171d2e;--line:#2b3450;--primary:#8f91ff;--on:#0e1320;--ok:#19b394;--off:#6b7690;color-scheme:dark}}
+:root[data-theme=dark]{--ink:#e8ecf6;--muted:#9aa6bb;--bg:#0e1320;--card:#171d2e;--line:#2b3450;--primary:#8f91ff;--on:#0e1320;--ok:#19b394;--off:#6b7690;color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{padding:16px}
+.popup main{width:290px}.options main{max-width:480px;margin:32px auto}
+header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+header img{border-radius:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.row{display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--off)}.dot.on{background:var(--ok)}
+.clock{font-size:40px;font-weight:700;letter-spacing:1px;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted);font-size:13px}
+button{display:block;width:100%;margin-top:12px;padding:10px;border:0;border-radius:11px;background:var(--primary);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--primary);border:1px solid var(--line)}
+button:disabled{opacity:.55;cursor:default}
+input{width:100%;margin:6px 0;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+label{font-weight:600}
+.link{display:inline-block;margin-top:10px;color:var(--muted);font-size:12px}
+body.blocked{display:grid;place-items:center;min-height:100vh;text-align:center}
+.blocked main{max-width:420px}.blocked img{border-radius:18px}.blocked h1{font-size:22px;margin:12px 0 0}
+.blocked .clock{font-size:64px;margin:14px 0 4px}.task{font-size:16px;font-weight:600;margin:0 0 10px}
+select{width:100%;margin:6px 0 14px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab{width:auto;margin:0;padding:8px 14px;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;font-weight:600}
+.tab.on{background:var(--primary);color:var(--on);border-color:var(--primary)}
+.pane h2{margin:0 0 6px;font-size:17px}
+.steps{padding-left:20px;margin:10px 0 0}.steps li{margin:0 0 10px}
