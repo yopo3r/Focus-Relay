@@ -1,7 +1,0 @@
-Cambios de Focus Relay 3.27.0 respecto a 3.24.1 (solo archivos modificados o nuevos).
-Descomprime encima de tu carpeta focus-relay respetando las rutas (reemplaza los existentes).
-3.25.0: mascota tras suspender (Linux), borrar todos mis datos, PRIVACY.md, docs de cumplimiento.
-3.25.1: primer globo de texto sin destello en la esquina.
-3.26.0: carita descontenta al cerrar con codigo, codigos con mayusculas y minusculas.
-3.26.1: confirmacion simple opcional al cerrar la app en sesion.
-3.27.0: despedida de la mascota al cerrar la app.
