@@ -244,7 +244,7 @@ def main():
 
     def mascot_streak():
         log = esp_client.get_log(esp_client.url_of(load_config())) or []
-        return stats.streak(stats.calendar_counts([s for s in log if s.get("modo") != "D"]))
+        return stats.streak(stats.calendar_counts([s for s in log if s.get("modo") != "D"]), None, stats.streak_days(load_config()))
 
     import watchdog                                       # si la ventana se cuelga, deja la pila de hilos en hang.log
     watchdog.Watchdog(root, watchdog.log_path(config_dir()), version=APP_VERSION).start()

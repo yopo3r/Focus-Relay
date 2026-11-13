@@ -699,5 +699,7 @@
  "mascotaSaludoM": "Buongiorno! Oggi andrà bene.|Ciao! Pronto a iniziare?|Ehi! Che bello iniziare la mattina con te.",
  "mascotaSaludoT": "Ciao! Che bello vederti.|Buon pomeriggio! Riprendiamo?|Ehi! Sono qui per farti compagnia.",
  "mascotaSaludoN": "Buonasera! Ancora un po', poi riposo.|Ciao! Si può ancora avanzare un pochino.|Ehi! Che bello vederti, anche di sera.",
- "mascotaSaludoNombre": "Ciao, {name}! Che bello vederti.|{name}, sono qui con te!|Bentornato, {name}!"
+ "mascotaSaludoNombre": "Ciao, {name}! Che bello vederti.|{name}, sono qui con te!|Bentornato, {name}!",
+ "subRachaDias": "Giorni della serie",
+ "rachaDiasAyuda": "Scegli i giorni in cui lavori. I giorni non selezionati non interrompono la serie (e contano se studi comunque). Ad esempio, solo dal lunedì al venerdì."
 }

@@ -7,6 +7,14 @@ from datetime import date, datetime, timedelta
 
 import stats
 
+
+def _load_cfg():
+    try:
+        from config import load_config
+        return load_config()
+    except Exception:
+        return {}
+
 KINDS = ("day", "week", "month", "year", "all")
 
 
@@ -139,21 +147,28 @@ def delta_pct(now, before):
 
 
 # ---------------------------------------------------------------- racha y logros
-def best_streak(counts):
-    days = sorted(counts)
+def best_streak(counts, days=None):
+    days = days or stats.ALL_DAYS
     best = run = 0
     prev = None
-    for d in days:
-        run = run + 1 if prev and (d - prev).days == 1 else 1
+    for d in sorted(counts):
+        if prev is not None:
+            gap = (d - prev).days
+            ok = all((prev + timedelta(days=k)).weekday() not in days for k in range(1, gap))
+            run = run + 1 if ok else 1
+        else:
+            run = 1
         best, prev = max(best, run), d
     return best
 
 
-def totals(log, tasks_by_date=None, today=None):
+def totals(log, tasks_by_date=None, today=None, streak_days=None):
     counts = stats.calendar_counts([s for s in log if is_focus(s)], today)
+    if streak_days is None:
+        streak_days = stats.streak_days(_load_cfg())
     focus = [s for s in log if is_focus(s)]
     return {
-        "streak": stats.streak(counts, today), "best_streak": best_streak(counts),
+        "streak": stats.streak(counts, today, streak_days), "best_streak": best_streak(counts, streak_days),
         "hours": sum(int(s.get("duracion_seg", 0)) for s in focus) / 3600.0,
         "sessions": sum(1 for s in focus if completed(s)),
         "pomodoros": sum(1 for s in log if s.get("modo") == "W" and completed(s)),

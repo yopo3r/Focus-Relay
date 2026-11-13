@@ -699,5 +699,7 @@
  "mascotaSaludoM": "Guten Morgen! Heute läuft es gut.|Hallo! Bereit loszulegen?|Hi! Schön, den Morgen mit dir zu beginnen.",
  "mascotaSaludoT": "Hallo! Schön, dich zu sehen.|Guten Tag! Machen wir weiter?|Hi! Ich bin da, um dich zu begleiten.",
  "mascotaSaludoN": "Guten Abend! Noch ein bisschen, dann Ruhe.|Hallo! Ein kleines Stück geht noch.|Hi! Schön, dich zu sehen, auch abends.",
- "mascotaSaludoNombre": "Hallo, {name}! Schön, dich zu sehen.|{name}, ich bin bei dir!|Willkommen zurück, {name}!"
+ "mascotaSaludoNombre": "Hallo, {name}! Schön, dich zu sehen.|{name}, ich bin bei dir!|Willkommen zurück, {name}!",
+ "subRachaDias": "Streak-Tage",
+ "rachaDiasAyuda": "Wähle die Tage, an denen du arbeitest. Nicht markierte Tage unterbrechen deine Serie nicht (und zählen trotzdem, wenn du lernst). Zum Beispiel nur Montag bis Freitag."
 }

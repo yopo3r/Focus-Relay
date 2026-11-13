@@ -29,13 +29,31 @@ def calendar_counts(log, today=None):
     return cal
 
 
-def streak(counts, today=None):
-    """Días seguidos con al menos una sesión. Si hoy aún no hay, cuenta desde ayer."""
+ALL_DAYS = (0, 1, 2, 3, 4, 5, 6)
+
+
+def streak_days(cfg):
+    """Días de la semana (0 = lunes … 6 = domingo) en los que se espera trabajar. Vacío o inválido => todos."""
+    try:
+        days = sorted({int(d) for d in (cfg or {}).get("streak_days", ALL_DAYS) if 0 <= int(d) <= 6})
+    except (TypeError, ValueError):
+        days = []
+    return tuple(days) or ALL_DAYS
+
+
+def streak(counts, today=None, days=None):
+    """Días de trabajo seguidos con al menos una sesión. Los días que no son de trabajo (`days`) no cortan la racha
+    ni suman, salvo que ese día sí se haya trabajado (suma). Si hoy es día de trabajo y aún no hay sesión, cuenta
+    desde ayer."""
+    days = days or ALL_DAYS
     today = today or date.today()
-    cursor = today if today in counts else today - timedelta(days=1)
+    cursor = today if (today in counts or today.weekday() not in days) else today - timedelta(days=1)
     n = 0
-    while cursor in counts:
-        n += 1
+    for _ in range(4000):                                  # tope de seguridad (~11 años)
+        if cursor in counts:
+            n += 1
+        elif cursor.weekday() in days:
+            break
         cursor -= timedelta(days=1)
     return n
 

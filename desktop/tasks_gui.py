@@ -15,6 +15,24 @@ def fmt_date(d, long=False):
     return i18n.date_label(d, long)
 
 
+_chip_cache = {}
+
+
+def _chip_photo(size, fill, outline):
+    """Círculo con bordes suaves (dibujado a 4x con Pillow y reducido); Tk no suaviza sus propios óvalos."""
+    key = (size, fill, outline)
+    if key not in _chip_cache:
+        try:
+            from PIL import Image, ImageDraw, ImageTk
+            k = 4
+            img = Image.new("RGBA", (size * k, size * k), (0, 0, 0, 0))
+            ImageDraw.Draw(img).ellipse((k, k, size * k - k - 1, size * k - k - 1), fill=fill, outline=outline, width=k)
+            _chip_cache[key] = ImageTk.PhotoImage(img.resize((size, size), Image.LANCZOS))
+        except Exception:
+            _chip_cache[key] = None
+    return _chip_cache[key]
+
+
 class DayChip(tk.Canvas):
     def __init__(self, parent, letter, on, command, size=28):
         super().__init__(parent, width=size, height=size, bg=ui.SURFACE, highlightthickness=0, bd=0, cursor="hand2")
@@ -26,7 +44,13 @@ class DayChip(tk.Canvas):
     def _paint(self):
         s = self._size
         self.delete("all")
-        self.create_oval(1, 1, s - 1, s - 1, fill=ui.PRIMARY if self.on else ui.TAG_BG, outline=ui.PRIMARY if self.on else ui.LINE)
+        fill, line = (ui.PRIMARY, ui.PRIMARY) if self.on else (ui.TAG_BG, ui.LINE)
+        photo = _chip_photo(s, fill, line)
+        if photo is not None:
+            self._img = photo                                   # referencia para que Tk no la libere
+            self.create_image(s / 2, s / 2, image=photo)
+        else:
+            self.create_oval(1, 1, s - 1, s - 1, fill=fill, outline=line)
         self.create_text(s / 2, s / 2, text=self._letter, font=ui.F("small_bold"),
                          fill=ui.ON_PRIMARY if self.on else ui.MUTED)
 

@@ -699,5 +699,7 @@
  "mascotaSaludoM": "Goedemorgen! Vandaag komt het goed.|Hoi! Klaar om te beginnen?|Hé! Fijn om de ochtend met je te starten.",
  "mascotaSaludoT": "Hoi! Fijn je te zien.|Goedemiddag! Zullen we verdergaan?|Hé! Ik ben er om je gezelschap te houden.",
  "mascotaSaludoN": "Goedenavond! Nog even, dan rust.|Hoi! Er kan nog een stukje bij.|Hé! Fijn je te zien, ook 's avonds.",
- "mascotaSaludoNombre": "Hoi, {name}! Fijn je te zien.|{name}, ik ben bij je!|Welkom terug, {name}!"
+ "mascotaSaludoNombre": "Hoi, {name}! Fijn je te zien.|{name}, ik ben bij je!|Welkom terug, {name}!",
+ "subRachaDias": "Reeksdagen",
+ "rachaDiasAyuda": "Kies de dagen waarop je werkt. Niet-aangevinkte dagen onderbreken je reeks niet (en tellen mee als je toch studeert). Bijvoorbeeld alleen maandag tot vrijdag."
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.24.1 — extensión 4.1.0
+
+- **Fix: weekday circles looked pixelated** (streak days in Settings and the automatic-task day chips). Tk doesn't anti-alias its ovals, so they're now drawn smoothly with Pillow (4x supersampled), falling back to the plain oval if Pillow isn't available.
+
+## 3.24.0 — extensión 4.1.0
+
+- **Configurable streak days** (Settings → General → "Streak days"). Pick the weekdays you work; unmarked days neither add to nor break your streak (and still count if you study on them). E.g. weekdays only: a weekend without the app keeps the streak. Applies everywhere the streak is used (panel, achievements, share images, mascot growth, best streak). Default: all 7 days, so nothing changes unless you opt in. Translated into all 11 languages.
+
 ## 3.23.3 — extensión 4.1.0
 
 - **Windows touchscreen / trackpad scrolling.** Tk on Windows does not always receive wheel events from touch or precision touchpads, so scrollable areas (settings, calendar list…) now also scroll by dragging a finger/pointer over them (8 px threshold so clicks are unaffected; inputs, sliders and scrollbars are excluded), by `<TouchpadScroll>` where Tk supports it, and with PageUp/PageDown.
