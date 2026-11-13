@@ -701,5 +701,15 @@
  "mascotaSaludoN": "Guten Abend! Noch ein bisschen, dann Ruhe.|Hallo! Ein kleines Stück geht noch.|Hi! Schön, dich zu sehen, auch abends.",
  "mascotaSaludoNombre": "Hallo, {name}! Schön, dich zu sehen.|{name}, ich bin bei dir!|Willkommen zurück, {name}!",
  "subRachaDias": "Streak-Tage",
- "rachaDiasAyuda": "Wähle die Tage, an denen du arbeitest. Nicht markierte Tage unterbrechen deine Serie nicht (und zählen trotzdem, wenn du lernst). Zum Beispiel nur Montag bis Freitag."
+ "rachaDiasAyuda": "Wähle die Tage, an denen du arbeitest. Nicht markierte Tage unterbrechen deine Serie nicht (und zählen trotzdem, wenn du lernst). Zum Beispiel nur Montag bis Freitag.",
+ "borrarTodoBoton": "Alle meine Daten löschen…",
+ "borrarTodoTitulo": "Alle Daten löschen?",
+ "borrarTodoTexto": "Deine Einstellungen, der Sitzungsverlauf, Aufgaben, Belohnungen und der Kalender werden von diesem Computer gelöscht. Das kann nicht rückgängig gemacht werden (erstelle vorher bei Bedarf eine Sicherung). Die App wird geschlossen und startet beim nächsten Mal neu.",
+ "estrictoCodigoMayus": "Codes unterscheiden Groß- und Kleinschreibung",
+ "confirmarCerrarLabel": "Beim Beenden der App während einer Sitzung nachfragen",
+ "quitConfTitulo": "Focus Relay beenden?",
+ "quitConfTexto": "Es läuft eine Sitzung. Wenn du die App beendest, wird sie nicht mehr erfasst.",
+ "mascotaDespide": "Beim Schließen der App verabschieden",
+ "mascotaDespedida": "Bis bald!|Tschüss! Ruh dich etwas aus.|Bis später! Gute Arbeit heute.|Bis zum nächsten Mal!",
+ "mascotaDespedidaNombre": "Bis bald, {name}!|Tschüss, {name}! Ruh dich aus.|Bis später, {name}! Gute Arbeit."
 }

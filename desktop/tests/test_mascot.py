@@ -185,6 +185,8 @@ class _W:
     def __init__(self, *a, **kw):
         self.opts, self._mapped, self._after = dict(kw), False, []
         self.geom = None
+        self.geom_at_map = "nunca"
+        self.calls_made = []
 
     def __getattr__(self, name):
         def any_method(*a, **kw):
@@ -200,6 +202,9 @@ class _W:
                 self._after.append(a)
             elif name == "geometry":
                 self.geom = a[0]
+            self.calls_made.append(name)
+            if name == "deiconify":
+                self.geom_at_map = self.geom
             elif name == "configure":
                 self.opts.update(kw)
             return None
@@ -357,6 +362,91 @@ class MascotWindowTests(unittest.TestCase):
         self.win._retry_at = 0
         self.win._tick()
         self.assertIsNot(self.win.top, old)
+
+    def test_windows_recreated_when_animation_stalls(self):
+        self.win._tick()
+        old = self.win.top
+        self.win._anim_at = time.time() - 60               # el bucle de dibujo murió (p. ej. tras la «espera moderna»)
+        self.win._tick()
+        self.assertIsNot(self.win.top, old)
+
+    def test_windows_recreated_when_clock_skews_from_monotonic(self):
+        self.win._tick()
+        old = self.win.top
+        self.win._last_mono -= 0                           # el monotónico no avanzó, el reloj de pared sí (suspensión)
+        self.win._last_tick = time.time() - 15
+        self.win._tick()
+        self.assertIsNot(self.win.top, old)
+
+    def test_windows_recreated_on_unlock_and_screen_change(self):
+        self.win._tick()
+        old = self.win.top
+        self.win._session_locked = lambda: True
+        self.win._tick()
+        self.assertIs(self.win.top, old)                   # bloqueada: aún no se toca
+        self.win._session_locked = lambda: False
+        self.win._tick()
+        self.assertIsNone(self.win.top)                    # al desbloquear se destruye y espera unos segundos
+        self.win._retry_at = 0
+        self.win._tick()
+        cur = self.win.top
+        self.assertIsNot(cur, old)                         # ...y se vuelve a crear
+        self.win._screen = (1, 1)
+        self.win._tick()
+        self.assertIsNone(self.win.top)                    # cambió la pantalla
+
+    def test_position_recomputed_after_transient_small_screen(self):
+        self.cfg["mascot_x"], self.cfg["mascot_y"] = 1500, 800
+        self.win._tick()
+        self.assertEqual((self.win.mx, self.win.my), (1500, 800))
+        self.win._screen = (1, 1)
+        self.win._screen_sig = lambda: (1, 1)               # aquí se prueba solo el recálculo de posición
+        self.win.top.winfo_screenwidth = lambda: 300       # pantalla en transición: no se toca nada
+        self.win._tick()
+        self.assertEqual((self.win.mx, self.win.my), (1500, 800))
+        self.win.top.winfo_screenwidth = lambda: 800       # pantalla más chica pero válida: se recorta...
+        self.win.top.winfo_screenheight = lambda: 600
+        self.win._tick()
+        self.assertLess(self.win.mx, 800)
+        self.win.top.winfo_screenwidth = lambda: 1920      # ...y al volver, regresa a la posición guardada
+        self.win.top.winfo_screenheight = lambda: 1080
+        self.win._tick()
+        self.assertEqual((self.win.mx, self.win.my), (1500, 800))
+
+    def test_first_bubble_is_placed_before_it_is_shown(self):
+        self.win._tick()                                   # el saludo inicial se pide antes de conocer la posición
+        self.assertTrue(self.win.bwin._mapped)
+        self.assertNotIn(self.win.bwin.geom_at_map, (None, "nunca"))     # ya tenía su sitio cuando se mostró
+        calls = self.win.bwin.calls_made
+        self.assertLess(calls.index("geometry"), calls.index("deiconify"))
+        self.assertIn("update_idletasks", calls[calls.index("geometry"):calls.index("deiconify")])
+
+    def test_goodbye_waves_shows_text_and_returns_wait(self):
+        self.win._tick()
+        wait = self.win.say_goodbye()
+        self.assertEqual(wait, self.m.BYE_SECONDS)
+        self.assertTrue(self.win._bubble_on)
+        self.assertTrue(self.win.message)
+        said = self.win.message
+        self.win._tick()                                   # el tick no pisa la despedida
+        self.assertEqual(self.win.message, said)
+        self.assertGreater(self.win._bye_until, time.time())
+
+    def test_goodbye_respects_option_and_hidden_mascot(self):
+        self.win._tick()
+        self.cfg["mascot_bye"] = False
+        self.assertEqual(self.win.say_goodbye(), 0.0)
+        self.cfg["mascot_bye"] = True
+        self.cfg["mascot"] = False
+        self.win._tick()                                   # mascota oculta: destruida
+        self.assertEqual(self.win.say_goodbye(), 0.0)
+
+    def test_farewell_pool_uses_name_sometimes(self):
+        texts = {"bye": "Chao|Hasta pronto", "bye_name": "Chao, {name}"}
+        self.assertEqual(self.m.farewell_pool(texts, "", random.Random(1)), ["Chao", "Hasta pronto"])
+        got = {tuple(self.m.farewell_pool(texts, "Yopo", random.Random(i))) for i in range(30)}
+        self.assertIn(("Chao, Yopo",), got)
+        self.assertIn(("Chao", "Hasta pronto"), got)
 
     def test_poke_while_focus_draws_only_two_hands(self):
         c = FakeCanvas()

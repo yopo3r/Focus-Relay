@@ -11,7 +11,7 @@ import platform
 import threading
 
 APP_DIR_NAME = "FocusRelayDesktop"
-APP_VERSION = "3.24.1"
+APP_VERSION = "3.27.0"
 CONFIG_FILE_NAME = "config.json"
 
 DEFAULT_CONFIG = {
@@ -32,10 +32,12 @@ DEFAULT_CONFIG = {
     "startup_tasks": False,        # al iniciar con el sistema (--background) abre el Panel en Tareas
     "mascot_color": "peach",       # paleta del cuerpo (ver mascot.PALETTES)
     "mascot_font": 10,            # tamaño de letra del globo (pt)
+    "mascot_bye": True,            # la mascota se despide al cerrar la app
     "mascot_text": True,           # muestra los globos de texto
     "mascot_on_top": True,         # se mantiene por encima de las demás aplicaciones
     "mascot": True,                # mascota «Brote» en la esquina inferior de la ventana (opcional)
     "confetti": True,              # confeti al terminar una sesión de enfoque
+    "confirm_quit": True,          # pedir confirmación simple al cerrar la app con una sesión en marcha (sin modo estricto)
     "confirm_stop": True,          # pedir confirmación al terminar una sesión antes de tiempo
     "strict_mode": False,          # modo estricto: terminar una sesión antes de tiempo exige confirmar varias veces
     "minimize_on_session": False,  # lo mismo al iniciar cualquier sesión (botón Iniciar, +5 min)
@@ -43,6 +45,7 @@ DEFAULT_CONFIG = {
     "strict_confirms": 3,          # cuántas confirmaciones seguidas (1 a 100)
     "block_in_timer": True,        # modo app: el bloqueo también actúa durante el Temporizador (no solo el Pomodoro)
     "next_activity": "",           # etiqueta o tarea que llevarán las próximas sesiones (se elige en el Panel)
+    "strict_code_mixed": False,    # los códigos aleatorios mezclan mayúsculas y minúsculas (y se comparan distinguiéndolas)
     "strict_stop_code": False,     # modo estricto: además de las confirmaciones, escribir un código aleatorio para terminar antes
     "block_in_chrono": False,      # el bloqueo también actúa durante el Cronómetro
     "enabled": True,
@@ -108,6 +111,11 @@ def config_dir():
         )
     path = os.path.join(base, APP_DIR_NAME)
     os.makedirs(path, exist_ok=True)
+    if system != "Windows":
+        try:
+            os.chmod(path, 0o700)            # los datos (sesiones, tareas, calendario) son solo del usuario
+        except OSError:
+            pass
     return path
 
 

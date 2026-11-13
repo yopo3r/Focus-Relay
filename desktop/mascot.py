@@ -19,6 +19,7 @@ from i18n import t
 MOODS = ("idle", "focus", "break", "party", "sleepy", "wary", "invite", "hello")
 PARTY_SECONDS = 4.5
 INVITE_CHANCE = 0.5
+ANIM_STALE = 8             # segundos sin dibujar un cuadro => el bucle de animación murió: se recrea
 RESUME_GAP = 20            # segundos sin latido del reloj interno => el equipo estuvo en suspensión
 MESSAGE_SECONDS = 120          # cada cuánto aparece un mensaje por sí sola
 BUBBLE_SECONDS = 7
@@ -120,6 +121,19 @@ def greeting_pool(texts, name="", hour=None, rng=random):
         if pool:
             return pool
     return split_pool(texts.get(slot, ""))
+
+
+BYE_SECONDS = 2.4          # lo que dura la despedida antes de cerrar la app
+
+
+def farewell_pool(texts, name="", rng=random):
+    """Despedida al cerrar la app; si hay nombre, a veces con él."""
+    name = (name or "").strip()
+    if name and rng.random() < 0.6:
+        pool = [m.format(name=name) for m in split_pool(texts.get("bye_name", "")) if "{name}" in m]
+        if pool:
+            return pool
+    return split_pool(texts.get("bye", ""))
 
 
 def pick(pool, last="", rng=random):
@@ -274,7 +288,7 @@ def texts():
             "party": t("mascotaFiesta"), "wary": t("mascotaSospecha"), "sleepy": t("mascotaSueno"), "poke": t("mascotaToque"),
             "streak": t("mascotaRacha"), "invite": t("mascotaInvita"),
             "hello_m": t("mascotaSaludoM"), "hello_t": t("mascotaSaludoT"), "hello_n": t("mascotaSaludoN"),
-            "hello_name": t("mascotaSaludoNombre")}
+            "hello_name": t("mascotaSaludoNombre"), "bye": t("mascotaDespedida"), "bye_name": t("mascotaDespedidaNombre")}
 
 
 MIN_FONT, MAX_FONT, DEFAULT_FONT = 8, 22, 10
@@ -358,7 +372,14 @@ class MascotWindow:
         self.invite_until = 0.0
         self.hello_until = 0.0
         self._last_tick = time.time()
+        self._last_mono = time.monotonic()
+        self._anim_at = time.time()
+        self._screen = None
+        self._scr = None
+        self._was_locked = False
+        self._bad_win = 0
         self._bubble_t0 = 0.0
+        self._bye_until = 0.0
         self._greeted = False
         self._font_pt = None
         self.bwin = None                    # ventana aparte del globo: así la mascota nunca cambia de tamaño
@@ -371,9 +392,14 @@ class MascotWindow:
         try:
             self.cfg = self.get_cfg()
             now = time.time()
-            if self.top is not None and now - self._last_tick > RESUME_GAP:
-                self._destroy()                                  # el equipo estuvo suspendido: se recrean las ventanas
-            self._last_tick = now
+            mono = time.monotonic()
+            if self.top is not None:
+                why = self._needs_recreate(now, mono)
+                if why:
+                    print(f"[Focus Relay] mascota: se recrean las ventanas ({why})")
+                    self._destroy()
+                    self._retry_at = time.time() + 3            # se espera a que la pantalla termine de despertar
+            self._last_tick, self._last_mono = now, mono
             if self.top is not None and not self._alive():      # otra parte de la app la cerró (p. ej. al cambiar de tema)
                 self._destroy()
             if self.cfg.get("mascot", True):
@@ -386,6 +412,63 @@ class MascotWindow:
         except Exception as exc:
             print(f"[Focus Relay] mascota: {exc}")
         self.root.after(1000, self._tick)
+
+    def _needs_recreate(self, now, mono):
+        """Motivos para reconstruir las ventanas: suspensión/hibernación (también la «espera moderna», en la que la app
+        sigue corriendo y no hay saltos de reloj), bloqueo de sesión, cambio de pantallas o animación detenida."""
+        gap = now - self._last_tick
+        if gap > RESUME_GAP:
+            return f"reloj saltó {int(gap)} s"
+        if gap - (mono - self._last_mono) > 10:                 # el reloj monotónico no cuenta el tiempo dormido
+            return "el equipo estuvo suspendido"
+        locked = self._session_locked()
+        was, self._was_locked = self._was_locked, locked
+        if was and not locked:
+            return "se desbloqueó la sesión"
+        screen = self._screen_sig()
+        old, self._screen = self._screen, screen
+        if old is not None and screen != old:
+            return f"cambió la pantalla {old} -> {screen}"
+        if now - self._anim_at > ANIM_STALE and not locked:
+            return "la animación se detuvo"
+        return None
+
+    def _screen_sig(self):
+        try:
+            if sys.platform.startswith("win"):
+                import ctypes
+                gm = ctypes.windll.user32.GetSystemMetrics
+                return (gm(76), gm(77), gm(78), gm(79), gm(80))    # origen y tamaño del escritorio virtual + monitores
+            return (self.top.winfo_screenwidth(), self.top.winfo_screenheight())
+        except Exception:
+            return self._screen
+
+    @staticmethod
+    def _session_locked():
+        """Windows: con la pantalla de bloqueo / inicio de sesión activa no se puede abrir el escritorio de entrada."""
+        if not sys.platform.startswith("win"):
+            return False
+        try:
+            import ctypes
+            u = ctypes.windll.user32
+            h = u.OpenInputDesktop(0, False, 0x0100)           # DESKTOP_SWITCHDESKTOP
+            if not h:
+                return True
+            u.CloseDesktop(h)
+            return False
+        except Exception:
+            return False
+
+    def _real_visible(self, win):
+        """Windows: ¿la ventana está realmente visible (no solo «mapeada» para Tk)? En otros sistemas, siempre True."""
+        if not sys.platform.startswith("win"):
+            return True
+        try:
+            import ctypes
+            hwnd = int(win.wm_frame(), 16) or win.winfo_id()
+            return bool(ctypes.windll.user32.IsWindowVisible(hwnd))
+        except Exception:
+            return True
 
     def _alive(self):
         try:
@@ -441,6 +524,8 @@ class MascotWindow:
             self._retry_at = time.time() + 30
             return
         self.size = 0
+        self._anim_at = time.time()
+        self._bad_win = 0
         self._geom = None
         self._bgeom = None
         self.mx = self.my = None
@@ -474,8 +559,14 @@ class MascotWindow:
             self.size = size
             self.canvas.configure(width=size, height=size)
             self._geom = None
+        sw, sh = self.top.winfo_screenwidth(), self.top.winfo_screenheight()
+        if sw < 400 or sh < 300:                 # pantalla en transición (p. ej. recién despertado de la suspensión)
+            return
+        if self._scr != (sw, sh):                # cambió el tamaño de pantalla: se recalcula desde lo guardado, no desde lo ya recortado
+            self._scr = (sw, sh)
+            if self._drag is None:
+                self.mx = None
         if self.mx is None or (self._drag is None and pos != self._cfg_pos):      # primera vez o posición cambiada en Ajustes
-            sw, sh = self.top.winfo_screenwidth(), self.top.winfo_screenheight()
             x, y = pos if None not in pos else (sw - size - 40, sh - size - 110)
             self.mx, self.my = clamp_pos(x, y, size, size, sw, sh)
             self._cfg_pos = pos
@@ -499,6 +590,20 @@ class MascotWindow:
             self.top.deiconify()
             self._geom = None
             self._place()
+        if self._shown and not self._real_visible(self.top):       # Tk cree que se ve, pero el sistema la ocultó
+            self._bad_win += 1
+            self._dbg("la mascota no era visible para el sistema; se vuelve a mostrar", always=True)
+            self.top.withdraw()
+            self.top.deiconify()
+            self._geom = None
+            self._place()
+            if self._bad_win >= 3:                                 # no se arregla remapeándola: se reconstruye
+                self._bad_win = 0
+                print("[Focus Relay] mascota: se recrean las ventanas (invisible para el sistema)")
+                self._destroy()
+                return
+        else:
+            self._bad_win = 0
         self._ensure_bubble_visible()
         if on_top and sys.platform.startswith("win") and now - self._last_lift > 5:
             # Otras ventanas «al frente» (video a pantalla completa, administrador de tareas) pueden quitarle el puesto.
@@ -520,6 +625,8 @@ class MascotWindow:
             self.celebrate_seen = celebrate
             self.party_until = now + PARTY_SECONDS
             self._say("party")
+        if now < self._bye_until:
+            return                                                    # despidiéndose: nada cambia el mensaje
         mood = mood_for(estado, self.party_until, wary=is_wary(now))
         if mood != self.mood:
             self.mood = mood
@@ -541,6 +648,24 @@ class MascotWindow:
         threading.Thread(target=work, daemon=True).start()
 
     # -- mensajes
+    def say_goodbye(self):
+        """Despedida al cerrar la app: saluda con la mano y (si el texto está activo) se despide. Devuelve los segundos
+        que conviene esperar antes de cerrar (0 si la mascota no está visible o la opción está apagada)."""
+        try:
+            cfg = self.get_cfg()
+            if self.top is None or not cfg.get("mascot", True) or not cfg.get("mascot_bye", True):
+                return 0.0
+            self._bye_until = time.time() + BYE_SECONDS
+            self.party_until = 0.0
+            text = pick(farewell_pool(self.get_texts(), cfg.get("user_name", "")))
+            if text:
+                self.message = text
+                self._show_bubble(text)
+            return BYE_SECONDS
+        except Exception as exc:
+            print(f"[Focus Relay] mascota: {exc}")
+            return 0.0
+
     def _greet(self):
         pool = greeting_pool(self.get_texts(), (self.cfg or {}).get("user_name", ""))
         text = pick(pool)
@@ -595,7 +720,7 @@ class MascotWindow:
                           always=time.time() - self._bubble_t0 > 1.5)
                 self.bwin.withdraw()
                 self.bwin.deiconify()
-            elif self._bgeom and "+" in self._bgeom:
+            elif self._bgeom and "+" in self._bgeom and time.time() - self._bubble_t0 > 1.5:
                 ex, ey = (int(v) for v in self._bgeom.lstrip("+").split("+"))
                 if abs(self.bwin.winfo_rootx() - ex) > 4 or abs(self.bwin.winfo_rooty() - ey) > 4:
                     self._dbg("el globo estaba fuera de su sitio; se recoloca", always=True)
@@ -638,14 +763,19 @@ class MascotWindow:
             if geom != self._bgeom:
                 self._bgeom = geom
                 self.bwin.geometry(geom)
+                self.bwin.update_idletasks()             # que el sistema la reciba ya colocada: si no, la primera vez
+                                                         # aparece un instante en la esquina (0, 0) antes de moverse
 
     # -- animación
     def _anim(self):
         if self.top is None:
             return
         started = time.perf_counter()
+        self._anim_at = time.time()
         mood_now = mood_for(self.estado, self.party_until, wary=is_wary())
-        if mood_now in ("idle", "break") and time.time() < self.hello_until:        # saludo de bienvenida
+        if time.time() < self._bye_until:                                          # despedida al cerrar la app
+            mood_now = "hello"
+        elif mood_now in ("idle", "break") and time.time() < self.hello_until:        # saludo de bienvenida
             mood_now = "hello"
         elif mood_now == "idle" and time.time() < self.invite_until:         # cara de «¿empezamos?» mientras dura la invitación
             mood_now = "invite"

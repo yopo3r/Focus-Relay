@@ -1,5 +1,27 @@
 # Changelog
 
+## 3.27.0 — extensión 4.1.0
+
+- **The mascot can say goodbye when the app closes** (Settings → Mascot, "Say goodbye when the app closes"; on by default). It waves with its happy face and, if its text is on, says a farewell (sometimes with your name), and the app closes about 2.4 s later. Translated into all 11 languages.
+
+## 3.26.1 — extensión 4.1.0
+
+- **Optional simple confirmation when quitting the app during a session** (Settings → Behavior, "Ask for confirmation when quitting the app during a session"; on by default). Applies when strict mode is off and a session is running (strict mode keeps its code); the mascot shows its wary face while you decide. Translated into all 11 languages.
+
+## 3.26.0 — extensión 4.1.0
+
+- **Fix: the mascot now shows its wary face when you try to quit the app mid-session** from the tray icon (strict mode's quit code dialog); before, only the early-stop dialogs triggered it.
+- **New option "Codes are case-sensitive (mixed upper and lower case)"** (Settings → Behavior, strict mode). Random codes (turn off strict mode, finish early, quit the app) then mix upper- and lower-case letters, always at least one of each, using only letters whose two forms look clearly different (no K/k, S/s, V/v…), and must be typed with the exact case. Off by default; can't be changed while a session is running. Translated into all 11 languages.
+
+## 3.25.1 — extensión 4.1.0
+
+- **Fix: the first speech bubble flashed in the opposite corner for an instant.** The initial greeting is requested before the mascot's position is known, and the bubble window was mapped before the window system had received its geometry, so on first show it appeared at (0, 0) and then jumped. The geometry is now flushed (`update_idletasks`) before the bubble is shown; the position self-check also waits 1.5 s after a bubble appears.
+
+## 3.25.0 — extensión 4.1.0
+
+- **Fix (Linux Mint): mascot and its text vanished after the PC suspended and resumed.** After waking, the screen can briefly report a wrong size, which left the mascot at a clamped, off-place position until it was hidden/shown from Settings. Now the position is always recomputed from the saved one when the screen size changes (transient tiny screens are ignored), windows are rebuilt a few seconds after resume, and suspension is also detected through the monotonic clock (which doesn't count sleep), session unlock, screen changes, a stalled animation loop and (Windows) windows the OS reports as not visible. Each rebuild prints a `[Focus Relay] mascota: se recrean las ventanas (motivo)` line.
+- **Privacy / data-protection (Chile, Ley 21.719):** new **Settings → About → "Delete all my data…"** (right of erasure; removes settings, history, tasks, rewards, calendar, caches and `hang.log`, then closes the app); data folder now `0700` on Linux/macOS; new `PRIVACY.md` (versioned policy with rights and network connections) and `docs/CUMPLIMIENTO-DATOS-CL.md` (technical compliance review); `SECURITY.md` corrected (calendar sync is independent of music); privacy warning in the bug-report template.
+
 ## 3.24.1 — extensión 4.1.0
 
 - **Fix: weekday circles looked pixelated** (streak days in Settings and the automatic-task day chips). Tk doesn't anti-alias its ovals, so they're now drawn smoothly with Pillow (4x supersampled), falling back to the plain oval if Pillow isn't available.

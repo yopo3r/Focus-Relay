@@ -248,7 +248,7 @@ def main():
 
     import watchdog                                       # si la ventana se cuelga, deja la pila de hilos en hang.log
     watchdog.Watchdog(root, watchdog.log_path(config_dir()), version=APP_VERSION).start()
-    mascot.MascotWindow(root, mascot_state, load_config, update_config, mascot.texts, mascot_streak,
+    mascot_win = mascot.MascotWindow(root, mascot_state, load_config, update_config, mascot.texts, mascot_streak,
                         lambda: __import__("dashboard_gui").open_dashboard(root, shared_state, state_lock))
     shared_state["notify"] = notify                      # el panel avisa con él (p. ej. al iniciar una tarea)
     background = services.Background(shared_state, state_lock, notify)
@@ -304,14 +304,24 @@ def main():
         from calendar_gui import open_calendar_window
         root.after(0, lambda: open_calendar_window(root))
 
+    quitting = [False]
+
     def _really_quit():
+        if quitting[0]:
+            return
+        quitting[0] = True
         stop_event.set()
         if tray_icon is not None:
             try:
                 tray_icon.stop()
             except Exception:
                 pass
-        root.after(0, root.destroy)
+        wait = 0.0
+        try:
+            wait = mascot_win.say_goodbye()               # la mascota se despide un momento antes de cerrar
+        except Exception as exc:
+            print(f"[Focus Relay] mascota: {exc}")
+        root.after(int(wait * 1000), root.destroy)
 
     quit_asking = [False]
 
@@ -323,16 +333,43 @@ def main():
             return
         with state_lock:
             est = shared_state.get("estado")
-        if not guard.quit_locked(load_config(), est):
-            _really_quit()
+        cfg0 = load_config()
+        if not guard.quit_locked(cfg0, est):
+            if not guard.quit_needs_confirm(cfg0, est):
+                _really_quit()
+                return
+            quit_asking[0] = True                            # confirmación simple (opcional) si hay una sesión en marcha
+            try:
+                import mascot
+                from dashboard_gui import open_dashboard as _open, _open as _state
+                _open(root, shared_state, state_lock)
+                mascot.set_wary(True)
+                try:
+                    ok = ui.confirm(_state.get("top"), t("quitConfTitulo"), t("quitConfTexto"), yes=t("quitBoton"), danger=True)
+                finally:
+                    mascot.set_wary(False)
+                if ok:
+                    _really_quit()
+            except Exception as exc:
+                print(f"[Focus Relay] cierre: {exc}")
+                _really_quit()
+            finally:
+                quit_asking[0] = False
             return
         quit_asking[0] = True
         try:
             from dashboard_gui import open_dashboard as _open, _open as _state
             _open(root, shared_state, state_lock)
             parent = _state.get("top")
-            if ui.ask_code(parent, t("quitTitulo"), t("quitTexto"), guard.new_code(3, 4), t("quitBoton"), t("cancelar"),
-                           t("estrictoCodigoMal")):
+            import mascot
+            cfg = load_config()
+            mascot.set_wary(True)                            # Brote te mira raro mientras dudas
+            try:
+                ok = ui.ask_code(parent, t("quitTitulo"), t("quitTexto"), guard.new_code(3, 4, guard.code_mixed(cfg)),
+                                 t("quitBoton"), t("cancelar"), t("estrictoCodigoMal"), guard.code_mixed(cfg))
+            finally:
+                mascot.set_wary(False)
+            if ok:
                 _really_quit()
         except Exception as exc:
             print(f"[Focus Relay] cierre: {exc}")        # ante un fallo de la interfaz no se deja la app imposible de cerrar

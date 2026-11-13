@@ -701,5 +701,15 @@
  "mascotaSaludoN": "Goedenavond! Nog even, dan rust.|Hoi! Er kan nog een stukje bij.|Hé! Fijn je te zien, ook 's avonds.",
  "mascotaSaludoNombre": "Hoi, {name}! Fijn je te zien.|{name}, ik ben bij je!|Welkom terug, {name}!",
  "subRachaDias": "Reeksdagen",
- "rachaDiasAyuda": "Kies de dagen waarop je werkt. Niet-aangevinkte dagen onderbreken je reeks niet (en tellen mee als je toch studeert). Bijvoorbeeld alleen maandag tot vrijdag."
+ "rachaDiasAyuda": "Kies de dagen waarop je werkt. Niet-aangevinkte dagen onderbreken je reeks niet (en tellen mee als je toch studeert). Bijvoorbeeld alleen maandag tot vrijdag.",
+ "borrarTodoBoton": "Al mijn gegevens wissen…",
+ "borrarTodoTitulo": "Al je gegevens wissen?",
+ "borrarTodoTexto": "Je instellingen, sessiegeschiedenis, taken, beloningen en agenda worden van deze computer gewist. Dit kan niet ongedaan worden gemaakt (maak eerst een back-up als dat nodig is). De app sluit en start de volgende keer opnieuw.",
+ "estrictoCodigoMayus": "Codes zijn hoofdlettergevoelig",
+ "confirmarCerrarLabel": "Om bevestiging vragen bij afsluiten tijdens een sessie",
+ "quitConfTitulo": "Focus Relay afsluiten?",
+ "quitConfTexto": "Er loopt een sessie. Als je de app afsluit, wordt die niet meer bijgehouden.",
+ "mascotaDespide": "Gedag zeggen bij het sluiten van de app",
+ "mascotaDespedida": "Tot snel!|Doei! Rust een beetje uit.|Tot later! Goed werk vandaag.|Tot de volgende keer!",
+ "mascotaDespedidaNombre": "Tot snel, {name}!|Doei, {name}! Rust uit.|Tot later, {name}! Goed werk."
 }

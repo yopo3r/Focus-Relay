@@ -844,8 +844,8 @@ class Dashboard:
             if never and not strict:
                 self._save_cfg(confirm_stop=False)
         if strict and self.cfg.get("strict_stop_code"):         # última barrera: escribir un código aleatorio
-            if not ui.ask_code(self.top, t("stopCodigoTitulo"), t("stopCodigoTexto"), guard.new_code(),
-                               t("stopTerminar"), t("stopSeguir"), t("estrictoCodigoMal")):
+            if not ui.ask_code(self.top, t("stopCodigoTitulo"), t("stopCodigoTexto"), guard.new_code(mixed=guard.code_mixed(self.cfg)),
+                               t("stopTerminar"), t("stopSeguir"), t("estrictoCodigoMal"), guard.code_mixed(self.cfg)):
                 return False
         # si mientras se confirmaba la sesión terminó sola, no hay nada que detener (y un «toggle» la reiniciaría)
         return guard.session_at_risk(getattr(self, "_live_estado", None))
@@ -1439,8 +1439,8 @@ class Dashboard:
             self.strict_notice.set(t("estrictoBloqueado"), "error")
             return
         if was_on and not on and not ui.ask_code(self.top, t("estrictoCodigoTitulo"), t("estrictoCodigoTexto"),
-                                                 guard.new_code(), t("estrictoCodigoBoton"), t("cancelar"),
-                                                 t("estrictoCodigoMal")):
+                                                 guard.new_code(mixed=guard.code_mixed(self.cfg)), t("estrictoCodigoBoton"),
+                                                 t("cancelar"), t("estrictoCodigoMal"), guard.code_mixed(self.cfg)):
             self.strict_var.set(True)
             return
         self.strict_notice.set("", "success")
@@ -1454,6 +1454,15 @@ class Dashboard:
             return
         self.strict_notice.set("", "success")
         self._save_cfg(strict_stop_code=bool(self.strict_code_var.get()))
+
+    def _save_strict_mixed(self):
+        """«Código con mayúsculas y minúsculas»: tampoco se cambia con una sesión en marcha."""
+        if self._session_running():
+            self.strict_mixed_var.set(guard.code_mixed(self.cfg))
+            self.strict_notice.set(t("estrictoBloqueado"), "error")
+            return
+        self.strict_notice.set("", "success")
+        self._save_cfg(strict_code_mixed=bool(self.strict_mixed_var.get()))
 
     def _sync_strict_lock(self):
         """Deshabilita los controles del modo estricto y del bloqueo mientras hay una sesión en marcha."""
@@ -1469,6 +1478,7 @@ class Dashboard:
             return
         try:
             self.strict_code_chk.state(["disabled"] if self._session_running() else ["!disabled"])
+            self.strict_mixed_chk.state(["disabled"] if self._session_running() else ["!disabled"])
         except tk.TclError:
             pass
         locked = guard.settings_locked(self.cfg, getattr(self, "_live_estado", None))
@@ -1748,6 +1758,9 @@ class Dashboard:
         self.confirm_var = tk.BooleanVar(value=bool(self.cfg.get("confirm_stop", True)))
         ui.checkbutton(b.body, t("confirmarStopLabel"), self.confirm_var,
                        command=lambda: self._save_cfg(confirm_stop=bool(self.confirm_var.get()))).pack(fill="x")
+        self.confirm_quit_var = tk.BooleanVar(value=bool(self.cfg.get("confirm_quit", True)))
+        ui.checkbutton(b.body, t("confirmarCerrarLabel"), self.confirm_quit_var,
+                       command=lambda: self._save_cfg(confirm_quit=bool(self.confirm_quit_var.get()))).pack(fill="x", pady=(8, 0))
         self.strict_var = tk.BooleanVar(value=bool(self.cfg.get("strict_mode", False)))
         self.strict_chk = ui.checkbutton(b.body, t("estrictoLabel"), self.strict_var, command=self._save_strict)
         self.strict_chk.pack(fill="x", pady=(8, 0))
@@ -1764,6 +1777,10 @@ class Dashboard:
         self.strict_code_chk = ui.checkbutton(b.body, t("estrictoCodigoStop"), self.strict_code_var,
                                               command=self._save_strict_code)
         self.strict_code_chk.pack(fill="x", pady=(6, 0), padx=(24, 0))
+        self.strict_mixed_var = tk.BooleanVar(value=guard.code_mixed(self.cfg))
+        self.strict_mixed_chk = ui.checkbutton(b.body, t("estrictoCodigoMayus"), self.strict_mixed_var,
+                                               command=self._save_strict_mixed)
+        self.strict_mixed_chk.pack(fill="x", pady=(6, 0), padx=(24, 0))
         self.strict_notice = ui.Notice(b.body, "error")
         self.strict_notice.pack(fill="x", pady=(6, 0))
         self._sync_strict_lock()
@@ -1782,6 +1799,9 @@ class Dashboard:
         self.mascot_text_var = tk.BooleanVar(value=bool(self.cfg.get("mascot_text", True)))
         ui.checkbutton(mb.body, t("mascotaTexto"), self.mascot_text_var,
                        command=lambda: self._save_cfg(mascot_text=bool(self.mascot_text_var.get()))).pack(fill="x", pady=(4, 0), padx=(24, 0))
+        self.mascot_bye_var = tk.BooleanVar(value=bool(self.cfg.get("mascot_bye", True)))
+        ui.checkbutton(mb.body, t("mascotaDespide"), self.mascot_bye_var,
+                       command=lambda: self._save_cfg(mascot_bye=bool(self.mascot_bye_var.get()))).pack(fill="x", pady=(4, 0), padx=(24, 0))
         self.mascot_top_var = tk.BooleanVar(value=bool(self.cfg.get("mascot_on_top", True)))
         ui.checkbutton(mb.body, t("mascotaAlFrente"), self.mascot_top_var,
                        command=lambda: self._save_cfg(mascot_on_top=bool(self.mascot_top_var.get()))).pack(fill="x", pady=(4, 0), padx=(24, 0))

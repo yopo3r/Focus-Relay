@@ -37,7 +37,7 @@ Al abrir por primera vez se muestra un tutorial; elige «Solo en la app» si no 
 - Etiqueta o tarea de las próximas sesiones elegible desde el Panel; menú de la bandeja que cambia según el estado.
 - Mascota flotante opcional «Brote»: arrástrala, cambia su tamaño y mantenla sobre las demás apps; te anima, celebra tus sesiones y crece con tu racha.
 - 11 idiomas (es, en, fr, pt, de, it, nl, ru, ja, ko, zh), 8 temas, tamaño de texto ajustable, respaldo/restauración de datos.
-- Sin cuentas, sin telemetría: todo queda en tu equipo. Ver [SECURITY.md](SECURITY.md).
+- Sin cuentas, sin telemetría: todo queda en tu equipo. Ver [PRIVACY.md](PRIVACY.md) y [SECURITY.md](SECURITY.md).
 
 ## English
 Focus Relay is a study-timer ecosystem: a **desktop app** (Python/tkinter, Windows & Linux, works without hardware), a **Chrome extension** and **ESP-01S firmware** for a physical timer. No accounts, no telemetry; all data stays on your machine.

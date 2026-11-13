@@ -126,12 +126,26 @@ class AboutPage:
             holder.pack(fill="x")
             _wrapped(dash, holder, body, "muted")
 
+        ui.Button(b, t("borrarTodoBoton"), self._erase_all, style="danger").pack(anchor="w", pady=(14, 0))
+
         # --- créditos
         card = dash._card(parent, t("creditosTitulo"))
         card.pack(fill="x")
         holder = tk.Frame(card.body, bg=ui.SURFACE)
         holder.pack(fill="x")
         _wrapped(dash, holder, t("creditosCuerpo"), "muted")
+
+    def _erase_all(self):
+        """Derecho de supresión: borra todos los datos locales y cierra la app (se vuelve a abrir como nueva)."""
+        import backup
+        top = self.d.top
+        if not ui.confirm(top, t("borrarTodoTitulo"), t("borrarTodoTexto"), yes=t("borrar"), danger=True):
+            return
+        backup.erase_all()
+        try:
+            self.d.root.event_generate("<<QuitApp>>")
+        except Exception:
+            pass
 
     def _open(self, path):
         if not open_folder(path):

@@ -701,5 +701,15 @@
  "mascotaSaludoN": "こんばんは！もう少しだけやって、休もう。|やあ！まだ少し進められるよ。|こんばんは！夜でも会えてうれしいな。",
  "mascotaSaludoNombre": "こんにちは、{name}！会えてうれしいな。|{name}、そばにいるよ！|おかえり、{name}！",
  "subRachaDias": "連続記録の曜日",
- "rachaDiasAyuda": "作業する曜日を選んでください。選ばなかった曜日は連続記録を途切れさせません（勉強した場合は加算されます）。例：平日のみ。"
+ "rachaDiasAyuda": "作業する曜日を選んでください。選ばなかった曜日は連続記録を途切れさせません（勉強した場合は加算されます）。例：平日のみ。",
+ "borrarTodoBoton": "すべてのデータを削除…",
+ "borrarTodoTitulo": "すべてのデータを削除しますか？",
+ "borrarTodoTexto": "設定、セッション履歴、タスク、報酬、カレンダーがこのコンピューターから削除されます。元に戻せません（必要なら先にバックアップを作成してください）。アプリは終了し、次回は新規状態で起動します。",
+ "estrictoCodigoMayus": "コードは大文字と小文字を区別する",
+ "confirmarCerrarLabel": "セッション中にアプリを終了するとき確認する",
+ "quitConfTitulo": "Focus Relay を終了しますか？",
+ "quitConfTexto": "セッションが進行中です。アプリを終了すると記録されなくなります。",
+ "mascotaDespide": "アプリを閉じるときにあいさつする",
+ "mascotaDespedida": "またね！|バイバイ！少し休んでね。|じゃあね！今日もお疲れさま。|また今度ね！",
+ "mascotaDespedidaNombre": "またね、{name}！|バイバイ、{name}！休んでね。|じゃあね、{name}！お疲れさま。"
 }

@@ -701,5 +701,15 @@
  "mascotaSaludoN": "Buonasera! Ancora un po', poi riposo.|Ciao! Si può ancora avanzare un pochino.|Ehi! Che bello vederti, anche di sera.",
  "mascotaSaludoNombre": "Ciao, {name}! Che bello vederti.|{name}, sono qui con te!|Bentornato, {name}!",
  "subRachaDias": "Giorni della serie",
- "rachaDiasAyuda": "Scegli i giorni in cui lavori. I giorni non selezionati non interrompono la serie (e contano se studi comunque). Ad esempio, solo dal lunedì al venerdì."
+ "rachaDiasAyuda": "Scegli i giorni in cui lavori. I giorni non selezionati non interrompono la serie (e contano se studi comunque). Ad esempio, solo dal lunedì al venerdì.",
+ "borrarTodoBoton": "Elimina tutti i miei dati…",
+ "borrarTodoTitulo": "Eliminare tutti i tuoi dati?",
+ "borrarTodoTexto": "Impostazioni, cronologia delle sessioni, attività, premi e calendario verranno cancellati da questo computer. Non si può annullare (fai prima un backup se serve). L'app si chiuderà e ripartirà da zero.",
+ "estrictoCodigoMayus": "I codici distinguono maiuscole e minuscole",
+ "confirmarCerrarLabel": "Chiedi conferma chiudendo l'app durante una sessione",
+ "quitConfTitulo": "Chiudere Focus Relay?",
+ "quitConfTexto": "C'è una sessione in corso. Se chiudi l'app, non verrà più tracciata.",
+ "mascotaDespide": "Saluta quando l'app si chiude",
+ "mascotaDespedida": "A presto!|Ciao! Riposati un po'.|Ci vediamo! Buon lavoro oggi.|Alla prossima!",
+ "mascotaDespedidaNombre": "A presto, {name}!|Ciao, {name}! Riposati.|Ci vediamo, {name}! Bel lavoro."
 }

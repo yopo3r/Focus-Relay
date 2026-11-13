@@ -43,6 +43,28 @@ class GuardTests(unittest.TestCase):
             self.assertFalse(guard.settings_locked(cfg, est))
         self.assertFalse(guard.settings_locked({"strict_mode": False}, TIMER))
 
+    def test_quit_confirmation_is_optional(self):
+        self.assertTrue(guard.quit_needs_confirm({}, TIMER))                       # por defecto, con sesión en marcha
+        self.assertTrue(guard.quit_needs_confirm({}, CHRONO))
+        self.assertFalse(guard.quit_needs_confirm({"confirm_quit": False}, TIMER))   # se puede desactivar
+        self.assertFalse(guard.quit_needs_confirm({}, IDLE))                       # sin sesión no pregunta
+        self.assertFalse(guard.quit_needs_confirm({}, None))
+
+    def test_mixed_case_codes(self):
+        codes = {guard.new_code(mixed=True) for _ in range(300)}
+        self.assertGreater(len(codes), 290)
+        for c in codes:
+            self.assertRegex(c, r"^[A-Za-z2-9]{4}-[A-Za-z2-9]{4}$")
+            self.assertTrue(any(ch.isupper() for ch in c) and any(ch.islower() for ch in c))
+            self.assertFalse(set(c) & set("KkSsVvWwXxZzCcUuPpOo01IiLlJj"))     # sin letras ambiguas
+        self.assertEqual(len(guard.new_code(3, 4, True).replace("-", "")), 12)
+        self.assertTrue(guard.code_matches("Ab7Q-dT4h", "Ab7Qdt4h".replace("t", "T"), True))
+        self.assertTrue(guard.code_matches("Ab7Q-dT4h", " Ab7Q dT4h ", True))
+        self.assertFalse(guard.code_matches("Ab7Q-dT4h", "ab7q-dt4h", True))      # distingue mayúsculas
+        self.assertTrue(guard.code_matches("Ab7Q-dT4h", "ab7q-dt4h"))             # sin la opción, no
+        self.assertFalse(guard.code_mixed({}))
+        self.assertTrue(guard.code_mixed({"strict_code_mixed": True}))
+
     def test_unlock_code_is_random_readable_and_forgiving(self):
         codes = {guard.new_code() for _ in range(200)}
         self.assertGreater(len(codes), 190)                   # distinto cada vez

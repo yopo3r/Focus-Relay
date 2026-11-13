@@ -4,7 +4,7 @@
 
 **Repository:** [https://github.com/yopo3r/Focus-Relay](https://github.com/yopo3r/Focus-Relay) — [releases (updates)](https://github.com/yopo3r/Focus-Relay/releases) · [report a bug](https://github.com/yopo3r/Focus-Relay/issues/new?template=bug_report.md) · [suggest an improvement](https://github.com/yopo3r/Focus-Relay/issues/new?template=feature_request.md)
 
-A study-timer ecosystem (Pomodoro, timer and stopwatch) made of three parts you can use together or separately. No accounts, no telemetry: everything stays on your machine (see [SECURITY.md](SECURITY.md)).
+A study-timer ecosystem (Pomodoro, timer and stopwatch) made of three parts you can use together or separately. No accounts, no telemetry: everything stays on your machine (see [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md)).
 
 | Folder | What it is |
 |---|---|
